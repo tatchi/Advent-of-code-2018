@@ -968,9 +968,11 @@ let data = "+11
 +124236";;
 
 let frequencies = List.map int_of_string (String.split_on_char '\n' data);;
-let result1 = frequencies |> List.fold_left
+let solution1 = frequencies |> List.fold_left
   (+)
   0;;
+
+print_endline ("Solution1: " ^ string_of_int(solution1));;
   
 module IntSet = Set.Make(
   struct 
@@ -987,10 +989,10 @@ let findFirstDoubleOccurence allChanges =
         let newResult = lastResult + h in
         match IntSet.mem newResult accResults with
         | true -> newResult
-    | false -> helper (IntSet.add newResult accResults) newResult tail
+      | false -> helper (IntSet.add newResult accResults) newResult tail
  in helper IntSet.empty 0 frequencies
     
-let test = findFirstDoubleOccurence frequencies;;
-print_int test
+let solution2 = findFirstDoubleOccurence frequencies;;
+print_endline ("Solution2: " ^ string_of_int(solution2));;
 
 

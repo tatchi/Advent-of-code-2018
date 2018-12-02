@@ -968,21 +968,29 @@ let data = "+11
 +124236";;
 
 let frequencies = List.map int_of_string (String.split_on_char '\n' data);;
-let result1 = List.fold_left
-  (fun acc v -> acc +v)
-  0
-  frequencies;;
+let result1 = frequencies |> List.fold_left
+  (+)
+  0;;
   
-let findFirstDoubleOccurence list =
-  let rec myFn acc nList = match nList with
-    | [] -> myFn (acc) list 
-    | first::rest -> 
-        let lastResult = List.hd acc in
-        let newResult = lastResult + first in
-        match List.find_opt (fun v -> v = newResult) acc with
-        | Some x -> x
-        | None -> myFn (newResult::acc) rest   
-  in myFn [0] list;;
+module IntSet = Set.Make(
+  struct 
+    type t = int
+    let compare = Pervasives.compare
+  end
+)
+
+let findFirstDoubleOccurence allChanges = 
+  let rec helper accResults lastResult changes =
+      match changes with
+      | [] -> helper accResults lastResult allChanges
+      |h::tail -> 
+        let newResult = lastResult + h in
+        match IntSet.mem newResult accResults with
+        | true -> newResult
+    | false -> helper (IntSet.add newResult accResults) newResult tail
+ in helper IntSet.empty 0 frequencies
     
 let test = findFirstDoubleOccurence frequencies;;
 print_int test
+
+

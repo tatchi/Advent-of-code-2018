@@ -250,42 +250,73 @@ fonbsmjyquwrapeezivghtvdql
 fonbdmjyqujsapeczikghtvdxl
 "
 
+let boxIds = String.split_on_char '\n' data
 
-let boxIds = String.split_on_char '\n' data;;
+module MyMap = Map.Make (Char)
 
-module MyMap = Map.Make(Char);;
-
-let test = MyMap.add 'a' 1 MyMap.empty;;
+let test = MyMap.add 'a' 1 MyMap.empty
 
 let explode s =
-  let rec exp i l =
-    if i < 0 then l else exp (i - 1) (s.[i] :: l) in
-  exp (String.length s - 1) [];;
+  let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
+  exp (String.length s - 1) []
 
 let countEachWord s =
   let rec helper listChar myMap =
-  match listChar with
-  | [] -> myMap
-  |h::tail -> 
-  let newMap = (MyMap.update h (fun v -> match v with | Some x -> Some (x+1) | None -> Some 1) myMap) in
-   helper tail newMap
-  in helper (explode s) MyMap.empty;;
-  
-let res = countEachWord "saluuttaa";;
+    match listChar with
+    | [] -> myMap
+    | h :: tail ->
+        let newMap =
+          MyMap.update h
+            (fun v -> match v with Some x -> Some (x + 1) | None -> Some 1)
+            myMap
+        in
+        helper tail newMap
+  in
+  helper (explode s) MyMap.empty
 
-let getNb2Nb3 myMap = MyMap.fold
-(fun k v (curr2, curr3) -> match v with 
-  | 2 -> (1,curr3)
-  | 3 -> (curr2,1)
-  | _ -> (curr2,curr3))
-myMap
-(0,0);;
-let sumAll = List.fold_left
-(fun (accA, accB) (a,b) -> (accA+a,accB+b))
-(0,0);;
+let getNb2Nb3 myMap =
+  MyMap.fold
+    (fun k v (curr2, curr3) ->
+      match v with 2 -> (1, curr3) | 3 -> (curr2, 1) | _ -> (curr2, curr3) )
+    myMap (0, 0)
 
-let resu = List.map (fun v -> v |>countEachWord |> getNb2Nb3) boxIds ;;
+let sumAll =
+  List.fold_left (fun (accA, accB) (a, b) -> (accA + a, accB + b)) (0, 0)
 
-let f = let (a,b) = sumAll resu in a * b;;
+let resu = List.map (fun v -> v |> countEachWord |> getNb2Nb3) boxIds
 
-MyMap.bindings res;;
+let result1 =
+  let a, b = sumAll resu in
+  a * b
+
+let findDiffBy1 strings =
+  let res = ref ("", "") in
+  for i = 0 to List.length strings - 1 do
+    let currentString = List.nth strings i in
+    let currentStringChars = explode currentString in
+    for j = i + 1 to List.length strings - 2 do
+      let stringToCompare = List.nth strings j in
+      let theDiff =
+        List.mapi
+          (fun index char -> char = stringToCompare.[index])
+          currentStringChars
+      in
+      if List.length (List.filter (fun v -> v = false) theDiff) = 1 then
+        res := (stringToCompare, currentString)
+    done
+  done ;
+  let final = ref "" in
+  let first, second = !res in
+  for i = 0 to String.length first - 1 do
+    let firstI = first.[i] in
+    if firstI = second.[i] then final := !final ^ Char.escaped firstI
+  done ;
+  !final
+
+;;
+
+let result2 = findDiffBy1 boxIds;;
+
+print_endline result2;;
+
+(*MyMap.bindings res;;*)

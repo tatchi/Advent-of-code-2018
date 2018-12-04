@@ -967,32 +967,31 @@ let data = "+11
 -12
 +124236";;
 
-let frequencies = List.map int_of_string (String.split_on_char '\n' data);;
-let solution1 = frequencies |> List.fold_left
-  (+)
-  0;;
 
-print_endline ("Solution1: " ^ string_of_int(solution1));;
-  
-module IntSet = Set.Make(
-  struct 
-    type t = int
-    let compare = Pervasives.compare
-  end
-)
+let frequencies = List.map int_of_string (String.split_on_char '\n' data)
 
-let findFirstDoubleOccurence allChanges = 
+let solution1 = frequencies |> List.fold_left ( + ) 0;;
+
+print_endline ("Solution1: " ^ string_of_int solution1);;
+
+module IntSet = Set.Make (struct
+  type t = int
+
+  let compare = Pervasives.compare
+end)
+
+let findFirstDoubleOccurence allChanges =
   let rec helper accResults lastResult changes =
-      match changes with
-      | [] -> helper accResults lastResult allChanges
-      |h::tail -> 
+    match changes with
+    | [] -> helper accResults lastResult allChanges
+    | h :: tail -> (
         let newResult = lastResult + h in
         match IntSet.mem newResult accResults with
         | true -> newResult
-      | false -> helper (IntSet.add newResult accResults) newResult tail
- in helper IntSet.empty 0 frequencies
-    
+        | false -> helper (IntSet.add newResult accResults) newResult tail )
+  in
+  helper IntSet.empty 0 frequencies
+
 let solution2 = findFirstDoubleOccurence frequencies;;
-print_endline ("Solution2: " ^ string_of_int(solution2));;
 
-
+print_endline ("Solution2: " ^ string_of_int solution2);;
